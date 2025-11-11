@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login → Good Night</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0f1020; /* deep space */
+      --bg2:#17182f; /* night indigo */
+      --accent:#8a7aff; /* soft violet */
+      --accent2:#61e6ff; /* neon cyan */
+      --glow:#ffc46b; /* warm glow */
+      --text:#e9ecff;
+      --muted:#aab3ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 80% -10%, #2b2d5e33, #0000),
+                  radial-gradient(1000px 600px at -20% 120%, #00eaff11, #0000),
+                  linear-gradient(160deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+
+    /* ---------- Shared Layout ---------- */
+    .screen{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      transition:opacity .7s ease, transform .7s ease, visibility .7s;
+    }
+    .hidden{opacity:0; transform:scale(.98); visibility:hidden; pointer-events:none}
+
+    /* ---------- Orbital decorations ---------- */
+    .orbs{position:absolute; inset:0; overflow:hidden; pointer-events:none}
+    .orb{
+      position:absolute; border-radius:50%; filter:blur(40px); opacity:.5;
+      background: radial-gradient(circle at 30% 30%, #fff6, #0000 60%), var(--accent2);
+      mix-blend-mode:screen;
+      animation: float 18s ease-in-out infinite;
+    }
+    .orb.violet{background: radial-gradient(circle at 40% 40%, #fff4, #0000 60%), var(--accent)}
+    .orb.small{width:180px; height:180px}
+    .orb.med{width:280px; height:280px}
+    .orb.big{width:420px; height:420px}
+    .orb.o1{top:-80px; left:-80px}
+    .orb.o2{bottom:-120px; right:-120px; animation-delay:-6s}
+    .orb.o3{top:40%; right:10%; animation-delay:-12s}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+    /* ---------- Glass card ---------- */
+    .card{
+      width:min(92vw, 560px);
+      padding:32px;
+      border-radius:28px;
+      background: linear-gradient( to bottom right, #ffffff12, #ffffff06 );
+      border:1px solid #ffffff2b;
+      box-shadow: 0 10px 40px #0008, inset 0 1px 0 #fff3;
+      backdrop-filter: blur(10px) saturate(120%);
+    }
+
+    /* ---------- Login Screen ---------- */
+    #login h1{
+      margin:0 0 8px; font-size:clamp(28px, 5vw, 40px); font-weight:800; letter-spacing:.5px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    #login p{margin:0 0 24px; color:var(--muted)}
+
+    .inputWrap{position:relative; margin:14px 0 18px}
+    .inputWrap input{
+      width:100%;
+      font:600 16px Poppins, system-ui;
+      padding:18px 52px 18px 18px;
+      color:var(--text);
+      border-radius:16px;
+      border:1px solid #ffffff30;
+      background: linear-gradient(180deg, #151636aa, #0f1030aa);
+      outline:none;
+      transition: box-shadow .25s, border .25s, transform .05s;
+    }
+    .inputWrap input::placeholder{color:#b9c0ff80; letter-spacing:.5px}
+    .inputWrap .glint{
+      position:absolute; right:14px; top:50%; translate:0 -50%;
+      width:24px; height:24px; border-radius:999px;
+      box-shadow:0 0 24px 6px var(--accent2);
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent2));
+      opacity:.85; filter:hue-rotate(20deg) saturate(130%);
+      pointer-events:none;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+    .btn{
+      width:100%; cursor:pointer; user-select:none;
+      border:none; padding:16px 20px; border-radius:16px;
+      font:700 16px Poppins, system-ui; letter-spacing:.7px;
+      background: conic-gradient(from 0deg, var(--accent2), var(--accent), var(--accent2));
+      color:#0b0c1a;
+      box-shadow:0 12px 30px #0008, 0 0 0 2px #ffffff18 inset;
+      transition: transform .05s ease, filter .25s ease, box-shadow .25s ease;
+    }
+    .btn:hover{filter:saturate(120%)}
+    .btn:active{transform: translateY(1px)}
+
+    .mini{display:flex; gap:10px; align-items:center; color:#cdd3ff99; margin-top:10px; font-size:12px}
+    .tick{width:12px; height:12px; border-radius:3px; border:1px solid #ffffff55; display:grid; place-items:center}
+    .tick::after{content:""; width:7px; height:7px; background:linear-gradient(90deg, var(--accent2), var(--accent)); border-radius:2px; opacity:.8}
+
+    /* ---------- Night Screen ---------- */
+    #goodnight{position:absolute; inset:0;}
+    #goodnight .sky{
+      position:absolute; inset:0; overflow:hidden; border-radius:28px;
+      background: radial-gradient(1000px 600px at 20% -10%, #6a80ff22, #0000),
+                  radial-gradient(900px 500px at 110% 120%, #33e1ff11, #0000),
+                  linear-gradient(180deg, #0a0c1a, #0b1030 60%, #040616);
+      box-shadow: inset 0 0 120px #000a;
+    }
+
+    /* Stars */
+    .star{position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; opacity:.7; animation: twinkle 2.2s infinite ease-in-out}
+    @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+    /* Moon */
+    .moon{position:absolute; top:12%; right:10%; width:90px; height:90px; border-radius:50%;
+      background: radial-gradient(circle at 35% 35%, #fff8, #fff2 60%, #0000 61%), #fff8;
+      box-shadow:0 0 40px 10px #fff2, 0 0 120px 30px #fff1;
+    }
+    /* Hills */
+    .hills{position:absolute; bottom:-20px; left:-10%; right:-10%; height:36vh; filter:drop-shadow(0 -6px 40px #000a)}
+    .hill{position:absolute; bottom:0; border-radius:50%; background: linear-gradient(180deg, #0a1738, #020613); opacity:.95}
+    .hill.h1{width:70vw; height:40vh; left:-10%}
+    .hill.h2{width:60vw; height:34vh; left:30%}
+    .hill.h3{width:50vw; height:28vh; left:55%}
+
+    .gn-content{position:relative; z-index:2; display:grid; place-items:center; text-align:center; padding:32px}
+    .title{
+      font-size: clamp(34px, 7vw, 72px);
+      font-weight:800; letter-spacing:1px; margin:0 0 10px;
+      text-shadow: 0 0 12px #8a7aff66, 0 0 28px #61e6ff55;
+      background:linear-gradient(90deg, #ffffff, #cfe8ff);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .subtitle{margin:0 0 24px; color:#cfd6ffcc; font-size: clamp(14px, 2.4vw, 18px)}
+
+    .pill{
+      display:inline-flex; gap:10px; align-items:center; padding:12px 16px; border-radius:999px;
+      background: linear-gradient(90deg, #ffffff10, #ffffff05);
+      border:1px solid #ffffff24; backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px #0008, inset 0 0 0 1px #ffffff10;
+      color:#dbe6ff;
+    }
+    .pill small{opacity:.8}
+    .pill b{background:linear-gradient(90deg, var(--accent2), var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent}
+
+    .back{
+      position:fixed; left:20px; top:20px; z-index:10;
+      padding:10px 14px; border-radius:12px; border:1px solid #ffffff2a;
+      background:#0d1130aa; color:#e9ecff; font-weight:700; letter-spacing:.5px; cursor:pointer;
+      box-shadow:0 8px 24px #0008; backdrop-filter: blur(8px);
+    }
+    .back:hover{filter:saturate(120%)}
+
+    /* ---------- Responsive tweaks ---------- */
+    @media (max-width:460px){
+      .card{padding:24px}
+      .inputWrap input{padding:16px 46px 16px 14px}
+    }
+    /* ---------- ANDROID / SMALL MOBILE SCREEN FIX ---------- */
+@media only screen and (max-width: 480px) {
+  body {
+    padding: 0;
+    overflow: auto;
+  }
+  
+  .card {
+    width: 92%;
+    padding: 24px 20px;
+  }
+
+  #login h1 {
+    font-size: 28px;
+  }
+
+  .inputWrap input {
+    padding: 14px 42px 14px 14px;
+    font-size: 14px;
+  }
+
+  .btn {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .title {
+    font-size: 38px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  /* Make moon size correct on phone */
+  .moon {
+    width: 60px;
+    height: 60px;
+    right: 5%;
+    top: 8%;
+  }
+
+  /* Hills smaller for mobile */
+  .hill.h1 { height: 28vh; }
+  .hill.h2 { height: 24vh; }
+  .hill.h3 { height: 20vh; }
+}
+
+  </style>
+</head>
+<body>
+  <!-- floating orbs -->
+  <div class="orbs" aria-hidden="true">
+    <div class="orb big o1 violet"></div>
+    <div class="orb med o2"></div>
+    <div class="orb small o3 violet"></div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <section id="login" class="screen">
+    <div class="card">
+      <h1>Welcome 👋</h1>
+      <p>ENTER YOUR NAME</p>
+      <form id="loginForm">
+        <div class="inputWrap">
+          <input id="name" type="text" placeholder="ENTER YOUR NAME" minlength="1" maxlength="24" autocomplete="name" />
+          <span class="glint" aria-hidden="true"></span>
+        </div>
+        <button class="btn" type="submit">Enter</button>
+        <div class="mini"><span class="tick"></span><span>SASTA DESIGN BY TUGGU </span></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- GOOD NIGHT SCREEN -->
+  <section id="goodnight" class="screen hidden" aria-live="polite">
+    <button class="back" id="backBtn" title="Back to Login">⟵ Back</button>
+    <div class="card sky">
+      <!-- stars -->
+      <div class="moon" aria-hidden="true"></div>
+      <div class="hills" aria-hidden="true">
+        <div class="hill h1"></div>
+        <div class="hill h2"></div>
+        <div class="hill h3"></div>
+      </div>
+
+      <div class="gn-content">
+        <h2 class="title">GOOD NIGHT GUYS</h2>
+        <p class="subtitle" id="subtitle">Wishing you calm dreams and cozy vibes.</p>
+        
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // generate stars
+    const sky = document.querySelector('.sky');
+    for(let i=0;i<90;i++){
+      const s=document.createElement('span');
+      s.className='star';
+      const x=Math.random()*100, y=Math.random()*100;
+      s.style.left=x+'%'; s.style.top=y+'%';
+      s.style.animationDelay=(Math.random()*2)+'s';
+      s.style.transform=`scale(${.6+Math.random()*1.6})`;
+      sky.appendChild(s);
+    }
+
+    const login = document.getElementById('login');
+    const gn = document.getElementById('goodnight');
+    const form = document.getElementById('loginForm');
+    const nameInput = document.getElementById('name');
+    const subtitle = document.getElementById('subtitle');
+    const backBtn = document.getElementById('backBtn');
+
+    function showGN(){
+      login.classList.add('hidden');
+      gn.classList.remove('hidden');
+    }
+    function showLogin(){
+      gn.classList.add('hidden');
+      login.classList.remove('hidden');
+      nameInput.focus();
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const raw = nameInput.value.trim();
+      const name = raw.replace(/\s+/g,' ').slice(0,24);
+      localStorage.setItem('guestName', name);
+      subtitle.textContent = name
+        ? `Sleep well, ${name}! See you tomorrow.`
+        : 'Wishing you calm dreams and cozy vibes.';
+      showGN();
+    });
+
+    backBtn.addEventListener('click', showLogin);
+
+    // restore name if present
+    const saved = localStorage.getItem('guestName');
+    if(saved){
+      nameInput.value = saved;
+    }
+
+    // Allow Enter to submit even if input is not focused on mobile
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && !gn.classList.contains('hidden')){
+        // prevent accidental reload on mobile keyboards
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
